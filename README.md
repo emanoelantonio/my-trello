@@ -1,36 +1,172 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🚀 My Trello — Modern Fullstack App
 
-## Getting Started
+> A production-grade Trello-inspired project built with modern web technologies to demonstrate fullstack architecture, scalability patterns, and clean code principles.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 📌 About The Project
+
+This project is a modern implementation of a Kanban-style task management system inspired by Trello.
+
+The goal is not just to replicate features, but to demonstrate:
+
+* Modern React architecture
+* Server-first data patterns
+* Scalable folder organization
+* Clean code and maintainability
+* Real-world production practices
+
+This project is part of my continuous study of modern frontend and fullstack technologies.
+
+---
+
+## 🧠 Tech Stack
+
+### Core
+
+* Next.js (App Router)
+* React Server Components
+* Server Actions
+* TypeScript
+
+### Styling & UI
+
+* Tailwind CSS
+* shadcn/ui
+* Lucide Icons
+
+### State & Interaction
+
+* dnd-kit (Drag and Drop)
+
+### Backend / Database
+
+* Supabase (PostgreSQL + Auth + Realtime)
+
+### Package Manager
+
+* pnpm
+
+---
+
+## 🏗️ Architecture
+
+This project follows a **feature-based architecture**, organizing code by domain instead of generic folders.
+
+```
+src/
+  app/
+    (auth)/
+    (dashboard)/
+  features/
+    board/
+    list/
+    card/
+  lib/
+  types/
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Architectural Principles
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+* Server-first data fetching
+* Minimal client-side JavaScript
+* Clear separation between UI and business logic
+* Scalable structure for future features
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## ✨ Features (Planned & In Progress)
 
-To learn more about Next.js, take a look at the following resources:
+### ✅ Core
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+* User authentication
+* Create / edit / delete boards
+* Create / edit / delete lists
+* Create / edit / delete cards
+* Drag and drop reordering
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 🔄 Advanced
 
-## Deploy on Vercel
+* Realtime updates
+* Optimistic UI updates
+* Role-based permissions
+* Board collaboration
+* Activity history
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## ⚙️ Getting Started
+
+### 1. Clone the repository
+
+```
+git clone <your-repo-url>
+cd trello-clone
+```
+
+### 2. Install dependencies
+
+```
+pnpm install
+```
+
+### 3. Configure environment variables
+
+Create a `.env.local` file:
+
+```
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_SUPABASE_URL=your_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_key
+```
+
+### 4. Run development server
+
+```
+pnpm dev
+```
+
+---
+
+## 🚀 Deployment
+
+The project is optimized for deployment on Vercel.
+
+---
+
+## 📈 Why This Project Matters
+
+This is not just a CRUD demo.
+
+It demonstrates:
+
+* Understanding of modern React mental models
+* Server vs Client component architecture
+* Fullstack integration
+* Clean folder organization
+* Real-world engineering decisions
+
+---
+
+## 🛣️ Roadmap
+
+* [ ] Authentication
+* [ ] Database schema
+* [ ] Dashboard layout
+* [ ] Board page
+* [ ] Drag and drop
+* [ ] Realtime sync
+* [ ] Production deployment
+
+---
+
+## 👨‍💻 Author
+
+Emanoel Silva
+Frontend Developer
+
+---
+
+## 📄 License
+
+This project is for portfolio and educational purposes.
