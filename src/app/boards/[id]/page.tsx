@@ -249,6 +249,13 @@ export default function BoardPage() {
   const [isEditingColumn, setIsEditingColumn] = useState(false);
   const [newColumnTitle, setNewColumnTitle] = useState("");
   const [editingColumnTitle, setEditingColumnTitle] = useState("");
+
+  const [filters, setFilters] = useState({
+    priority: [] as string[],
+    assignee: [] as string[],
+    dueDate: null as string | null,
+  });
+
   const [editingColumn, setEditingColumn] = useState<ColumnWithTasks | null>(null)
 
   const [activeTask, setActiveTask] = useState<Task | null>(null);
@@ -261,6 +268,20 @@ export default function BoardPage() {
     total, column) => total + (
       column.tasks?.length ?? 0),
     0);
+
+  function handleFilterChange(
+    type: 'priority' | 'assignee' | 'dueDate',
+    value: string | string[] | null) {
+    setFilters((prev) => ({ ...prev, [type]: value, }));
+  };
+
+  function clearFilters() {
+    setFilters({
+      priority: [] as string[],
+      assignee: [] as string[],
+      dueDate: null as string | null,
+    });
+  }
 
   async function handleSaveChanges(event: React.SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -410,11 +431,28 @@ export default function BoardPage() {
     setEditingColumn(null);
   }
 
-  async function handleEditColumn(column: ColumnWithTasks) {
+  function handleEditColumn(column: ColumnWithTasks) {
     setIsEditingColumn(true);
     setEditingColumn(column);
     setEditingColumnTitle(column.title);
   }
+
+  const filteredColumns = columns.map((column) => ({
+    ...column,
+    tasks: column.tasks.filter((task) => {
+      if (filters.priority.length > 0 && !filters.priority.includes(task.priority)) {
+        return false;
+      }
+      if (filters.dueDate && task.due_date) {
+        const taskDate = new Date(task.due_date).toDateString()
+        const filterDate = new Date(filters.dueDate).toDateString()
+
+        if (taskDate !== filterDate) return false;
+      }
+
+      return true;
+    })
+  }))
 
   return (
     <>
@@ -427,7 +465,11 @@ export default function BoardPage() {
             setIsEditingTitle(true)
           }}
           onFilterClick={() => setIsFilterOpen(true)}
-          filterCount={2}
+          filterCount={Object.values(filters).reduce(
+            (count, v) => count + (Array.isArray(v)
+              ? v.length
+              : v !== null ? 1 : 0), 0
+          )}
         />
         <Dialog open={isEditingTitle} onOpenChange={setIsEditingTitle}>
           <DialogContent className="w-[95vw] max-w-106.25 mx-auto">
@@ -494,9 +536,15 @@ export default function BoardPage() {
                 <div className="flex flex-wrap gap-2">
                   {["low", "medium", "high"].map((priority, key) => (
                     <Button
+                      onClick={() => {
+                        const newPriorities = filters.priority.includes(priority)
+                          ? filters.priority.filter((p) => p !== priority)
+                          : [...filters.priority, priority];
+                        handleFilterChange('priority', newPriorities);
+                      }}
                       key={key}
                       size="sm"
-                      variant={"outline"}
+                      variant={filters.priority.includes(priority) ? 'default' : "outline"}
                       className="mr-2 mb-2"
                     >
                       {priority.charAt(0).toUpperCase() + priority.slice(1)}
@@ -505,27 +553,17 @@ export default function BoardPage() {
                 </div>
               </div>
             </div>
-            {/* <div className="space-y-2">
-            <Label htmlFor="priority">Assignee</Label>
-            <div className="flex flex-wrap gap-2">
-              {["low", "medium", "high"].map((priority, key) => (
-                <Button
-                  key={key}
-                  size="sm"
-                  variant={"outline"}
-                  className="mr-2 mb-2"
-                >
-                  {priority.charAt(0).toUpperCase() + priority.slice(1)}
-                </Button>
-              ))}
-            </div>
-          </div> */}
             <div className="space-y-2">
               <Label htmlFor="priority">Due Date</Label>
-              <Input type="date" min='2000-01-01' />
+              <Input
+                type="date"
+                min='2000-01-01'
+                value={filters.dueDate || ""}
+                onChange={(e) => handleFilterChange("dueDate", e.target.value || null)}
+              />
             </div>
             <div className="flex justify-between pt-4">
-              <Button type="button" variant="outline">
+              <Button type="button" variant="outline" onClick={clearFilters}>
                 Clear Filters
               </Button>
               <Button type="button" onClick={() => setIsFilterOpen(false)}>
@@ -615,7 +653,7 @@ export default function BoardPage() {
           >
             <div className="flex flex-col lg:flex-row lg:space-x-6 lg:overflow-x-auto lg:pb-6 lg:px-2 lg:-mx-2 lg:[&::-webkit-scrollbar-track]:bg-gray-100 lg:[&::-webkit-scrollbar-thumb]:bg-gray-300 lg:[&::-webkit-scrollbar-thumb]:rounded-full lg:[&::-webkit-scrollbar]:h-2 space-y-4 lg:space-y-0"
             >
-              {columns.map((column, key) => (
+              {filteredColumns.map((column, key) => (
                 <DroppableColumn
                   column={column}
                   key={key}
