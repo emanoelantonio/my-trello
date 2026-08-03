@@ -19,7 +19,7 @@ export default function DashboardPage() {
 
   const { user } = useUser();
   const { isFreeUser } = usePlan();
-  const { createBord, boards, loading, error } = useBoards();
+  const { createBoard, boards, loading, error } = useBoards();
   const router = useRouter();
 
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -72,7 +72,7 @@ export default function DashboardPage() {
       setShowUpgradeDialog(true);
       return;
     }
-    await createBord({ title: "New Board" });
+    await createBoard({ title: "New Board" });
   };
 
   if (error) {

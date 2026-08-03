@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { useBoard } from "@/hooks/useBoards";
+import { useBoard } from "@/hooks/useBoard";
 import { ColumnWithTasks, Task } from "@/lib/supabase/models";
 import { DndContext, DragEndEvent, DragOverEvent, DragOverlay, DragStartEvent, PointerSensor, rectIntersection, useDroppable, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
@@ -229,31 +229,38 @@ function TaskOverlay({ task }: { task: Task }) {
   )
 }
 
+type boardFilters = {
+  priority: string[];
+  assignee: string[];
+  dueDate: string | null;
+}
+
 export default function BoardPage() {
 
   const { id } = useParams<{ id: string }>();
   const {
     board,
-    updateBoard,
     columns,
     loading,
-    createRealTask,
-    setColumns,
+    createTask,
+    previewTaskMove,
+    updateBoard,
     moveTask, createColumn, updateColumn } = useBoard(id);
 
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newColor, setNewColor] = useState("");
+
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isCreatingColumn, setIsCreatingColumn] = useState(false);
   const [isEditingColumn, setIsEditingColumn] = useState(false);
   const [newColumnTitle, setNewColumnTitle] = useState("");
   const [editingColumnTitle, setEditingColumnTitle] = useState("");
 
-  const [filters, setFilters] = useState({
-    priority: [] as string[],
-    assignee: [] as string[],
-    dueDate: null as string | null,
+  const [filters, setFilters] = useState<boardFilters>({
+    priority: [],
+    assignee: [],
+    dueDate: null,
   });
 
   const [editingColumn, setEditingColumn] = useState<ColumnWithTasks | null>(null)
@@ -289,9 +296,9 @@ export default function BoardPage() {
     if (!newTitle.trim() || !board) return;
 
     try {
-      await updateBoard(board.id, {
+      await updateBoard({
         title: newTitle.trim(),
-        color: newColor || board.color
+        color: newColor.trim(),
       });
       setIsEditingTitle(false);
     } catch {
@@ -299,7 +306,7 @@ export default function BoardPage() {
     }
   }
 
-  async function createTask(taskData: {
+  async function createDataTask(taskData: {
     title: string;
     description?: string;
     assignee?: string;
@@ -312,7 +319,7 @@ export default function BoardPage() {
       throw new Error('No Column available to add task.')
     }
 
-    await createRealTask(targetColumn.id, taskData)
+    await createTask(targetColumn.id, taskData)
   }
 
   async function handleCreateTask(event: React.ChangeEvent<HTMLFormElement>) {
@@ -327,7 +334,7 @@ export default function BoardPage() {
     }
 
     if (taskData.title.trim()) {
-      await createTask(taskData)
+      await createDataTask(taskData)
 
       const trigger = document.querySelector('[data-state="open"') as HTMLElement;
       if (trigger) trigger.click();
@@ -345,49 +352,39 @@ export default function BoardPage() {
     const { active, over } = event
     if (!over) return;
 
-    const activeId = active.id as string;
-    const overId = over.id as string;
-    const sourceColumn = columns.find((col) => col.tasks.some((task) => task.id === activeId))
-    const targetColumn = columns.find((col) => col.tasks.some((task) => task.id === overId))
+    const activeTaskId = active.id.toString();
+    const overId = over.id.toString();
 
-    if (!sourceColumn || !targetColumn) return;
+    const sourceColumn = columns.find((column) =>
+      column.tasks.some((task) => task.id === activeTaskId));
 
-    if (sourceColumn.id === targetColumn.id) {
-      const activeIndex = sourceColumn.tasks.findIndex(
-        (task) => task.id === activeId
-      );
-      const overIndex = targetColumn.tasks.findIndex(
-        (task) => task.id === overId
-      );
-      if (activeIndex !== overIndex) {
-        setColumns((prev: ColumnWithTasks[]) => {
-          const newColumns = [...prev];
-          const column = newColumns.find((col) => col.id === sourceColumn.id);
+    if (!sourceColumn) return;
 
-          if (column) {
-            const tasks = [...column.tasks];
-            const [removed] = tasks.splice(activeIndex, 1);
-            tasks.splice(overIndex, 0, removed);
-            column.tasks = tasks;
-          }
-          return newColumns;
-        })
-      }
-    }
+    const targetColumn = columns.find((column) =>
+      column.tasks.some((task) => task.id === overId));
+
+    if (!targetColumn) return;
+
+    if (sourceColumn.id === targetColumn.id) return;
+
+    const targetIndex = targetColumn.tasks.length;
+
+    previewTaskMove(activeTaskId, targetColumn.id, targetIndex);
   }
 
   async function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
     if (!over) return;
 
-    const taskId = active.id as string;
-    const overId = over.id as string;
+    const taskId = active.id.toString();
+    const overId = over.id.toString();
 
     const targetColumn = columns.find((col) => col.id === overId);
 
     if (targetColumn) {
       const sourceColumn = columns.find((col) =>
         col.tasks.some((task) => task.id === taskId));
+
       if (sourceColumn && sourceColumn.id !== targetColumn.id) {
         await moveTask(taskId, targetColumn.id, targetColumn.tasks.length);
       }
