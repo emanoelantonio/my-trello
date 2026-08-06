@@ -71,7 +71,7 @@ export function useBoard(boardId: string) {
   }, [boardId, supabase]);
 
 
-  const createTask = useCallback(async (columnId: string, taskData: CreateTaskInput) => {
+  const createDataTask = useCallback(async (columnId: string, taskData: CreateTaskInput) => {
     try {
       setError(null);
 
@@ -201,7 +201,7 @@ export function useBoard(boardId: string) {
   }, [supabase]);
 
   return {
-    board, columns, loading, error, updateBoard, createTask, moveTask,
-    createColumn, updateColumn, reload: loadBoard,
+    board, columns, loading, error, updateBoard, createDataTask, moveTask,
+    createColumn, updateColumn, setColumns, reload: loadBoard,
   }
 }
