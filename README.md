@@ -126,6 +126,20 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_key
 pnpm dev
 ```
 
+### 5. Run tests
+
+Unit tests:
+
+```
+pnpm test:unit
+```
+
+Playwright end-to-end tests:
+
+```
+pnpm test:e2e
+```
+
 ---
 
 ## 🚀 Deployment

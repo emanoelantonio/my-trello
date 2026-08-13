@@ -14,7 +14,7 @@ interface BoardProps {
 }
 
 export default function Navbar({ boardTitle, onEditBoard, onFilterClick, filterCount = 0 }: BoardProps) {
-  const { isLoaded, user, isSignedIn } = useUser();
+  const { user, isSignedIn } = useUser();
   const pathname = usePathname();
 
   const isDashboardPage = pathname === "/dashboard";
@@ -26,7 +26,7 @@ export default function Navbar({ boardTitle, onEditBoard, onFilterClick, filterC
         <div className="container mx-auto px-4 py-3 sm:py-4 flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Trello className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600" />
-            <span className="text-xl sm:text-2xl font-bold text-gray-900">My Trello</span>
+            <span className="text-xl sm:text-2xl font-bold text-gray-900">MyTrello</span>
           </div>
           <div className="flex items-center space-x-2 sm:space-x-4">
             <UserButton />

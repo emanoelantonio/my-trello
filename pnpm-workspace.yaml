@@ -1,8 +1,11 @@
 allowBuilds:
   '@clerk/shared': false
+  esbuild: true
   msw: false
   sharp: false
   unrs-resolver: false
 ignoredBuiltDependencies:
   - sharp
   - unrs-resolver
+minimumReleaseAgeExclude:
+  - vite@8.2.1
