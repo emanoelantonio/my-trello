@@ -18,6 +18,47 @@ type UpdateBoardInput = {
   color?: string;
 }
 
+function moveTaskInColumns(
+  columns: ColumnWithTasks[],
+  taskId: string,
+  targetColumnId: string,
+  targetIndex: number
+): ColumnWithTasks[] {
+  const nextColumns = columns.map((column) => ({
+    ...column, tasks: [...column.tasks],
+  }));
+
+  let taskToMove: Task | null = null;
+
+  for (const column of nextColumns) {
+
+    const taskIndex = column.tasks.findIndex((task) => task.id === taskId);
+
+    if (taskIndex === -1) continue;
+
+    taskToMove = column.tasks[taskIndex];
+
+    column.tasks.splice(taskIndex, 1);
+
+    break;
+  }
+
+  if (!taskToMove) {
+    return columns;
+  }
+
+  const targetColumn = nextColumns.find((column) => column.id === targetColumnId);
+
+  if (!targetColumn) {
+
+    return columns;
+  }
+
+  targetColumn.tasks.splice(targetIndex, 0, taskToMove);
+
+  return nextColumns;
+}
+
 export function useBoard(boardId: string) {
 
   const { supabase, isLoaded } = useSupabase();
@@ -200,8 +241,23 @@ export function useBoard(boardId: string) {
     }
   }, [supabase]);
 
+  const previewTaskMove = useCallback((
+    taskId: string, targetColumnId: string, targetIndex: number) => {
+    setColumns((prevColumns) => {
+      moveTaskInColumns(
+        prevColumns, taskId, targetColumnId, targetIndex
+      )
+      return prevColumns;
+    })
+  }, [])
+
   return {
+<<<<<<< HEAD
     board, columns, loading, error, updateBoard, createDataTask, moveTask,
     createColumn, updateColumn, setColumns, reload: loadBoard,
+=======
+    board, columns, loading, error, updateBoard, createTask, moveTask, previewTaskMove,
+    createColumn, updateColumn, reload: loadBoard,
+>>>>>>> origin/develop
   }
 }

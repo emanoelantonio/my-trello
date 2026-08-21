@@ -229,30 +229,43 @@ function TaskOverlay({ task }: { task: Task }) {
   )
 }
 
+type boardFilters = {
+  priority: string[];
+  assignee: string[];
+  dueDate: string | null;
+}
+
 export default function BoardPage() {
 
   const { id } = useParams<{ id: string }>();
   const {
     board,
-    updateBoard,
     columns,
     loading,
+<<<<<<< HEAD
     createDataTask,
     moveTask, createColumn, updateColumn, setColumns } = useBoard(id);
+=======
+    createTask,
+    previewTaskMove,
+    updateBoard,
+    moveTask, createColumn, updateColumn } = useBoard(id);
+>>>>>>> origin/develop
 
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newColor, setNewColor] = useState("");
+
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isCreatingColumn, setIsCreatingColumn] = useState(false);
   const [isEditingColumn, setIsEditingColumn] = useState(false);
   const [newColumnTitle, setNewColumnTitle] = useState("");
   const [editingColumnTitle, setEditingColumnTitle] = useState("");
 
-  const [filters, setFilters] = useState({
-    priority: [] as string[],
-    assignee: [] as string[],
-    dueDate: null as string | null,
+  const [filters, setFilters] = useState<boardFilters>({
+    priority: [],
+    assignee: [],
+    dueDate: null,
   });
 
   const [editingColumn, setEditingColumn] = useState<ColumnWithTasks | null>(null)
@@ -290,7 +303,7 @@ export default function BoardPage() {
     try {
       await updateBoard({
         title: newTitle.trim(),
-        color: newColor || board.color
+        color: newColor.trim(),
       });
       setIsEditingTitle(false);
     } catch {
@@ -298,7 +311,7 @@ export default function BoardPage() {
     }
   }
 
-  async function createTask(taskData: {
+  async function createDataTask(taskData: {
     title: string;
     description?: string;
     assignee?: string;
@@ -311,7 +324,11 @@ export default function BoardPage() {
       throw new Error('No Column available to add task.')
     }
 
+<<<<<<< HEAD
     await createDataTask(targetColumn.id, taskData)
+=======
+    await createTask(targetColumn.id, taskData)
+>>>>>>> origin/develop
   }
 
   async function handleCreateTask(event: React.SubmitEvent<HTMLFormElement>, columnId?: string) {
@@ -326,7 +343,11 @@ export default function BoardPage() {
     }
 
     if (taskData.title.trim()) {
+<<<<<<< HEAD
       await createTask(taskData, columnId)
+=======
+      await createDataTask(taskData)
+>>>>>>> origin/develop
 
       const trigger = document.querySelector('[data-state="open"') as HTMLElement | null;
       if (trigger) trigger.click();
@@ -344,6 +365,7 @@ export default function BoardPage() {
     const { active, over } = event;
     if (!over) return;
 
+<<<<<<< HEAD
     const activeId = active.id as string;
     const overId = over.id as string;
 
@@ -379,6 +401,26 @@ export default function BoardPage() {
         return nextColumns;
       });
     }
+=======
+    const activeTaskId = active.id.toString();
+    const overId = over.id.toString();
+
+    const sourceColumn = columns.find((column) =>
+      column.tasks.some((task) => task.id === activeTaskId));
+
+    if (!sourceColumn) return;
+
+    const targetColumn = columns.find((column) =>
+      column.tasks.some((task) => task.id === overId));
+
+    if (!targetColumn) return;
+
+    if (sourceColumn.id === targetColumn.id) return;
+
+    const targetIndex = targetColumn.tasks.length;
+
+    previewTaskMove(activeTaskId, targetColumn.id, targetIndex);
+>>>>>>> origin/develop
   }
 
   async function handleDragEnd(event: DragEndEvent) {
@@ -388,12 +430,13 @@ export default function BoardPage() {
       return;
     }
 
-    const taskId = active.id as string;
-    const overId = over.id as string;
+    const taskId = active.id.toString();
+    const overId = over.id.toString();
 
     const sourceColumn = columns.find((col) =>
       col.tasks.some((task) => task.id === taskId));
 
+<<<<<<< HEAD
     if (!sourceColumn) {
       setActiveTask(null);
       return;
@@ -413,6 +456,14 @@ export default function BoardPage() {
     if (sourceColumn.id === targetColumn.id) {
       if (sourceIndex !== -1 && targetIndex !== -1 && sourceIndex !== targetIndex) {
         await moveTask(taskId, targetColumn.id, targetIndex);
+=======
+    if (targetColumn) {
+      const sourceColumn = columns.find((col) =>
+        col.tasks.some((task) => task.id === taskId));
+
+      if (sourceColumn && sourceColumn.id !== targetColumn.id) {
+        await moveTask(taskId, targetColumn.id, targetColumn.tasks.length);
+>>>>>>> origin/develop
       }
     } else {
       const destinationIndex = targetIndex === -1 ? targetColumn.tasks.length : targetIndex;
