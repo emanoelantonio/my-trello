@@ -3,6 +3,7 @@ import { SignInButton, SignUpButton, UserButton, useUser } from "@clerk/nextjs";
 import { ArrowLeft, ArrowRight, Filter, MoreHorizontal, Trello } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ThemeSelector } from "./themeSelector";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 
@@ -29,6 +30,7 @@ export default function Navbar({ boardTitle, onEditBoard, onFilterClick, filterC
             <span className="text-xl sm:text-2xl font-bold text-gray-900">MyTrello</span>
           </div>
           <div className="flex items-center space-x-2 sm:space-x-4">
+            <ThemeSelector />
             <UserButton />
           </div>
         </div>

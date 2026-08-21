@@ -20,7 +20,7 @@ import { useState } from "react";
 function DroppableColumn({ column, children, onCreateTask, onEditColumn }: {
   column: ColumnWithTasks;
   children: React.ReactNode;
-  onCreateTask: (event: React.SubmitEvent<HTMLFormElement>, columnId: string) => Promise<void>;
+  onCreateTask: (taskData: any) => Promise<void>;
   onEditColumn: (column: ColumnWithTasks) => void
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: column.id })
@@ -66,7 +66,7 @@ function DroppableColumn({ column, children, onCreateTask, onEditColumn }: {
                   Add a task to the board.
                 </p>
               </DialogHeader>
-              <form className="space-y-4" onSubmit={(event) => onCreateTask(event, column.id)}>
+              <form className="space-y-4" onSubmit={onCreateTask}>
                 <div className="space-y-2">
                   <Label>Title</Label>
                   <Input id="title" name="title" placeholder="Enter task title..." />
