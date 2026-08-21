@@ -312,7 +312,25 @@ npm run dev
 ```
 4. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
+<<<<<<< HEAD
+### 5. Run tests
+
+Unit tests:
+
+```
+pnpm test:unit
+```
+
+Playwright end-to-end tests:
+
+```
+pnpm test:e2e
+```
+
+---
+=======
 ## 🔗 Useful Links
+>>>>>>> origin/develop
 
 * [Next.js Docs](https://nextjs.org/docs)
 * [Supabase Docs](https://supabase.com/docs)

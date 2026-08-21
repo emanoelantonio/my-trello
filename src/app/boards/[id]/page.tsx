@@ -242,10 +242,15 @@ export default function BoardPage() {
     board,
     columns,
     loading,
+<<<<<<< HEAD
+    createDataTask,
+    moveTask, createColumn, updateColumn, setColumns } = useBoard(id);
+=======
     createTask,
     previewTaskMove,
     updateBoard,
     moveTask, createColumn, updateColumn } = useBoard(id);
+>>>>>>> origin/develop
 
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [newTitle, setNewTitle] = useState("");
@@ -312,17 +317,21 @@ export default function BoardPage() {
     assignee?: string;
     due_date?: string;
     priority: 'low' | 'medium' | 'high';
-  }) {
-    const targetColumn = columns[0]
+  }, columnId?: string) {
+    const targetColumn = columns.find((column) => column.id === columnId) ?? columns[0]
 
     if (!targetColumn) {
       throw new Error('No Column available to add task.')
     }
 
+<<<<<<< HEAD
+    await createDataTask(targetColumn.id, taskData)
+=======
     await createTask(targetColumn.id, taskData)
+>>>>>>> origin/develop
   }
 
-  async function handleCreateTask(event: React.ChangeEvent<HTMLFormElement>) {
+  async function handleCreateTask(event: React.SubmitEvent<HTMLFormElement>, columnId?: string) {
     event.preventDefault()
     const formData = new FormData(event.currentTarget)
     const taskData = {
@@ -334,9 +343,13 @@ export default function BoardPage() {
     }
 
     if (taskData.title.trim()) {
+<<<<<<< HEAD
+      await createTask(taskData, columnId)
+=======
       await createDataTask(taskData)
+>>>>>>> origin/develop
 
-      const trigger = document.querySelector('[data-state="open"') as HTMLElement;
+      const trigger = document.querySelector('[data-state="open"') as HTMLElement | null;
       if (trigger) trigger.click();
     }
   }
@@ -349,9 +362,46 @@ export default function BoardPage() {
   }
 
   function handleDragOver(event: DragOverEvent) {
-    const { active, over } = event
+    const { active, over } = event;
     if (!over) return;
 
+<<<<<<< HEAD
+    const activeId = active.id as string;
+    const overId = over.id as string;
+
+    const sourceColumn = columns.find((col) =>
+      col.tasks.some((task) => task.id === activeId));
+
+    if (!sourceColumn) return;
+
+    const targetColumn = columns.find((col) => col.id === overId)
+      ?? columns.find((col) => col.tasks.some((task) => task.id === overId));
+
+    if (!targetColumn) return;
+
+    if (sourceColumn.id === targetColumn.id) {
+      const activeIndex = sourceColumn.tasks.findIndex((task) => task.id === activeId);
+      const overIndex = targetColumn.tasks.findIndex((task) => task.id === overId);
+
+      if (activeIndex === -1 || overIndex === -1 || activeIndex === overIndex) return;
+
+      setColumns((prev: ColumnWithTasks[]) => {
+        const nextColumns = prev.map((column) => ({
+          ...column,
+          tasks: [...column.tasks],
+        }));
+
+        const column = nextColumns.find((item) => item.id === sourceColumn.id);
+
+        if (!column) return prev;
+
+        const [movedTask] = column.tasks.splice(activeIndex, 1);
+        column.tasks.splice(overIndex, 0, movedTask);
+
+        return nextColumns;
+      });
+    }
+=======
     const activeTaskId = active.id.toString();
     const overId = over.id.toString();
 
@@ -370,39 +420,57 @@ export default function BoardPage() {
     const targetIndex = targetColumn.tasks.length;
 
     previewTaskMove(activeTaskId, targetColumn.id, targetIndex);
+>>>>>>> origin/develop
   }
 
   async function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
-    if (!over) return;
+    if (!over) {
+      setActiveTask(null);
+      return;
+    }
 
     const taskId = active.id.toString();
     const overId = over.id.toString();
 
-    const targetColumn = columns.find((col) => col.id === overId);
+    const sourceColumn = columns.find((col) =>
+      col.tasks.some((task) => task.id === taskId));
 
+<<<<<<< HEAD
+    if (!sourceColumn) {
+      setActiveTask(null);
+      return;
+    }
+
+    const targetColumn = columns.find((col) => col.id === overId)
+      ?? columns.find((col) => col.tasks.some((task) => task.id === overId));
+
+    if (!targetColumn) {
+      setActiveTask(null);
+      return;
+    }
+
+    const sourceIndex = sourceColumn.tasks.findIndex((task) => task.id === taskId);
+    const targetIndex = targetColumn.tasks.findIndex((task) => task.id === overId);
+
+    if (sourceColumn.id === targetColumn.id) {
+      if (sourceIndex !== -1 && targetIndex !== -1 && sourceIndex !== targetIndex) {
+        await moveTask(taskId, targetColumn.id, targetIndex);
+=======
     if (targetColumn) {
       const sourceColumn = columns.find((col) =>
         col.tasks.some((task) => task.id === taskId));
 
       if (sourceColumn && sourceColumn.id !== targetColumn.id) {
         await moveTask(taskId, targetColumn.id, targetColumn.tasks.length);
+>>>>>>> origin/develop
       }
     } else {
-      const sourceColumn = columns.find((col) =>
-        col.tasks.some((task) => task.id === taskId));
-      const targetColumn = columns.find((col) =>
-        col.tasks.some((task) => task.id === overId));
-
-      if (sourceColumn && targetColumn) {
-        const oldIndex = sourceColumn.tasks.findIndex((task) => task.id === taskId);
-        const newIndex = targetColumn.tasks.findIndex((task) => task.id === overId);
-
-        if (oldIndex !== newIndex) {
-          await moveTask(taskId, targetColumn.id, newIndex);
-        }
-      }
+      const destinationIndex = targetIndex === -1 ? targetColumn.tasks.length : targetIndex;
+      await moveTask(taskId, targetColumn.id, destinationIndex);
     }
+
+    setActiveTask(null);
   }
 
   async function handleCreateColumn(event: React.ChangeEvent<HTMLFormElement>) {
